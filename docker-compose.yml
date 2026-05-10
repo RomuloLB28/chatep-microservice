@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  api_tcc:
+    build: .
+    container_name: api_tcc_container
+    restart: always
+    # Limites para não estourar a RAM da sua máquina/VPS
+    deploy:
+      resources:
+        limits:
+          memory: 7G 
+
+  nginx_tcc:
+    image: nginx:latest
+    container_name: nginx_tcc_container
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - api_tcc
+    restart: always
