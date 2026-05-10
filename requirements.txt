@@ -1,0 +1,36 @@
+"""fastapi
+uvicorn
+python-multipart
+openai-whisper
+torch
+ffmpeg-python
+transformers
+accelerate
+sentencepiece
+soundfile
+librosa
+"""
+
+# Servidor Web
+fastapi
+uvicorn[standard]
+gunicorn
+python-multipart
+
+# Processamento de Áudio
+librosa
+soundfile
+ffmpeg-python
+
+# IA e Modelos
+--index-url https://download.pytorch.org/whl/cpu
+torch
+transformers
+accelerate
+sentencepiece
+bitsandbytes
+safetensors
+scipy
+
+# Utilidades
+pydantic
