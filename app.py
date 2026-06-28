@@ -1,5 +1,6 @@
 from fastapi import FastAPI, UploadFile, File
 from pydantic import BaseModel
+from typing import Optional
 import torch
 import librosa
 import tempfile
@@ -66,14 +67,14 @@ print("Conversador loaded.")
 # DTOs
 # ============================
 
-
 class TextRequest(BaseModel):
     text: str
+    useCustomPrompt: Optional[bool] = False         # Flag ativadora Maker
+    customSystemPrompt: Optional[str] = None       # Prompt injetado pelo usuário
 
 # ============================
 # ROUTES
 # ============================
-
 
 @app.post("/transcribe")
 async def transcribe_audio(file: UploadFile = File(...)):
@@ -129,26 +130,33 @@ async def correct_text(request: TextRequest):
         "feedback": "Texto corrigido automaticamente pelo modelo."
     }
 
-
 @app.post("/chat")
 async def chat(request: TextRequest):
+    # 🧠 Lógica do Injetor de System Prompt (Modo Maker Ativo vs Padrão)
+    if request.useCustomPrompt and request.customSystemPrompt:
+        system_instruction = request.customSystemPrompt.strip()
+    else:
+        system_instruction = (
+            "You are an English tutor that helps users practice English.\n"
+            "if the User greets you with \"'hi','hello'\" or something like that, Always respond to him first with a greets."
+        )
 
-    prompt = f"""You are an English tutor that helps users practice English.
-    if the User greets you with "'hi','hello'" or something like that, Always respond to him first with a greets.
-    User: {request.text}
-    Tutor:"""
+    # Montagem dinâmica do Prompt preservando a estrutura aceita pelo Conversador02
+    prompt = f"""{system_instruction}
+User: {request.text}
+Tutor:"""
 
     inputs = conversador_tokenizer(
         prompt,
         return_tensors="pt",
         truncation=True,
-        max_length=128
+        max_length=256  # Aumentado levemente para acomodar instruções customizadas maiores
     )
 
     with torch.no_grad():
         outputs = conversador_model.generate(
             inputs["input_ids"],
-            max_new_tokens=60,  # gera só novos tokens
+            max_new_tokens=60,
             do_sample=False,
             eos_token_id=conversador_tokenizer.eos_token_id,
             pad_token_id=conversador_tokenizer.eos_token_id
@@ -159,10 +167,10 @@ async def chat(request: TextRequest):
         skip_special_tokens=True
     )
 
-    # Remove o prompt original
+    # Remove o prompt estruturado original de dentro da resposta do modelo
     assistant_response = response[len(prompt):].strip()
 
-    # 🔥 Corta se ele tentar iniciar outro turno
+    # Corta loops ou gerações que tentem simular um novo turno do usuário
     stop_tokens = ["User:", "<|user|>", "\nUser"]
     for stop_token in stop_tokens:
         if stop_token in assistant_response:
