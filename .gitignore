@@ -3,3 +3,9 @@ Conversador02-v02
 TUTOR02-Large-v02
 venv
 whisper-finetuned
+conversation.json
+grammar_samples1.json
+lyrics.txt
+sombr-12-to-12.wav
+.gitignore
+teste.py
