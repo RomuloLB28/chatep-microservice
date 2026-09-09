@@ -1,15 +1,4 @@
-"""fastapi
-uvicorn
-python-multipart
-openai-whisper
-torch
-ffmpeg-python
-transformers
-accelerate
-sentencepiece
-soundfile
-librosa
-"""
+--extra-index-url https://download.pytorch.org/whl/cpu
 
 # Servidor Web
 fastapi
@@ -23,7 +12,6 @@ soundfile
 ffmpeg-python
 
 # IA e Modelos
---index-url https://download.pytorch.org/whl/cpu
 torch
 transformers
 accelerate
