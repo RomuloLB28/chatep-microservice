@@ -109,3 +109,7 @@ O Nginx estará escutando na porta **80** da sua máquina/VPS, redirecionando as
 
 ## Link para os modelos no Hugging Face:
 https://huggingface.co/RomuloLB28
+
+## Link para o artigo do projeto:
+https://sol.sbc.org.br/index.php/ideia/article/view/43456
+
